@@ -1,19 +1,97 @@
 const router = require("express").Router();
 const Snippet = require("../models/snippetModel");
 
-// router.get("/test", (req, res) => {
-//     res.send("Router test");
-// });
+router.get("/", async (req, res) => {
+    try {
+        const snippets = await Snippet.find();
+        res.json(snippets);
+    }
+    catch(err) {
+        res.status(500).send();
+    }
+});
 
-router.post("/", (req, res) => {
-    const {title, description, code} = req.body;
+router.post("/", async (req, res) => {
+    try{
+        const {title, description, code} = req.body;
 
-    const newSnippet = new Snippet({
-        title, description, code
-    });
+        // validation
 
-    newSnippet.save();
-    res.send("title");
+        if(!description && !code) {
+            return res.status(400).json({
+                errorMessage: "You need to enter at least a description or some code."
+            });
+        }
+
+        const newSnippet = new Snippet({
+            title, description, code
+        });
+
+        const savedSnippet = await newSnippet.save();
+
+        res.json(savedSnippet);
+    }
+    catch(err) {
+        res.status(500).send();
+    }
 })
+
+router.put("/:id", async (req, res) => {
+    try {
+        const {title, description, code} = req.body;
+        const snippetId = req.params.id;
+
+        // validation
+
+        if(!description && !code) {
+            return res.status(400).json({
+                errorMessage: "You need to enter at least a description or some code."
+            });
+        }
+
+        if(!snippetId)
+            return res.status(400).json({ 
+                errorMessage: "Snippet ID not given. Please contact the developer."
+            });
+
+        const originalSnippet = await Snippet.findById(snippetId);
+        if(!originalSnippet)
+            return res.status(400).json({ 
+                errorMessage: "No Snippet with this ID was found. Please contact the developer."
+            });
+
+            originalSnippet.title = title;
+            originalSnippet.description = description;
+            originalSnippet.code = code;
+
+        const savedSnippet = await originalSnippet.save();
+
+        res.json(savedSnippet);
+    }
+    catch {
+        res.status(500).send();
+    }
+});
+
+router.delete("/:id", async (req, res) => {
+    try {
+        const snippetId = req.params.id;
+
+        // validation
+        if(!snippetId)
+            return res.status(400).json({ errorMessage: "Snippet ID not given. Please contact the developer."});
+
+        const existingSnippet = await Snippet.findById(snippetId);
+        if(!existingSnippet)
+            return res.status(400).json({ errorMessage: "No Snippet with this ID was found. Please contact the developer."});
+
+        await existingSnippet.delete();
+
+        res.json(existingSnippet);
+    }
+    catch {
+        res.status(500).send();
+    }
+});
 
 module.exports = router;
