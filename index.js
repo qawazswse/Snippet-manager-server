@@ -20,7 +20,7 @@ app.use("/snippet", require("./routers/snippetRouter"));
 // connect to mongoDB
 
 mongoose.connect(
-    "mongodb+srv://ujijmkiko:12121212q@snippet-manager.5fnmi.mongodb.net/mymain?retryWrites=true&w=majority", {
+    process.env.MDB_CONNECT_STRING, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     }, (err) => {
