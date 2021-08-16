@@ -1,5 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 // setup express server
 
@@ -28,4 +31,4 @@ mongoose.connect(
         console.log("Connected to MongoDB");
     });
 
-// mongodb+srv://ujijmkiko:<password>@snippet-manager.5fnmi.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
+    
